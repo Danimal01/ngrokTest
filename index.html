@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JWKS Proxy</title>
+    <script>
+        // This runs when the page loads
+        window.onload = function() {
+            fetch('https://cors-anywhere.herokuapp.com/https://b597-64-124-137-130.ngrok-free.app/realms/myrealm/protocol/openid-connect/certs', {
+                headers: {
+                    // Adding a custom user-agent to bypass ngrok's warning page
+                    'User-Agent': 'Custom-UA-For-Ngrok',
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();  // First, retrieve the raw text response
+            })
+            .then(data => {
+                try {
+                    // Attempt to parse the data to check if it's JSON
+                    let jsonData = JSON.parse(data);
+                    document.body.textContent = JSON.stringify(jsonData, null, 2);
+                } catch (e) {
+                    console.error('Data received is not valid JSON:', data);
+                    document.body.textContent = data;  // Display the raw data so you can debug
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching JWKS:', error);
+                document.body.textContent = 'Failed to retrieve JWKS';
+            });
+        };
+    </script>
+</head>
+<body>
+</body>
+</html>
